@@ -1,4 +1,4 @@
-import {Wired, WiredType} from '../wired/wired';
+import {Wired, WiredType} from '../wired';
 
 export class DateTimeWired implements Wired {
   type: WiredType = 'condition';

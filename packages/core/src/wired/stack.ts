@@ -1,4 +1,4 @@
-import {Wired, WIRED_COOLDOWN} from './wired';
+import {isConditionalWired, isTriggerWired, Wired, WIRED_COOLDOWN} from '.';
 
 export class Stack {
   constructor(private wireds: Wired[] = []) {}
@@ -14,10 +14,10 @@ export class Stack {
     }
   }
 
-  execute() {
-    if (this.hasConditionalWireds() && this.executeConditionalWireds()) {
+  async execute() {
+    if (await this.executeConditionalWireds()) {
       this.wireds.forEach(async wired => {
-        if (!this.isConditionalWired(wired) && !this.hasCooldown(wired)) {
+        if (!isTriggerWired(wired) && !this.hasCooldown(wired)) {
           await wired.execute();
         }
       });
@@ -31,16 +31,12 @@ export class Stack {
   }
 
   hasConditionalWireds() {
-    return this.wireds.some(wired => this.isConditionalWired(wired));
+    return this.wireds.some(wired => isConditionalWired(wired));
   }
 
-  isConditionalWired(wired: Wired): boolean {
-    return wired.type === 'condition';
-  }
-
-  executeConditionalWireds(): boolean {
+  async executeConditionalWireds(): Promise<boolean> {
     return this.wireds.every(async wired => {
-      if (this.isConditionalWired(wired)) {
+      if (isConditionalWired(wired)) {
         return await wired.execute();
       }
       return true;

@@ -1,5 +1,4 @@
-import {Stack} from './stack';
-import {Wired} from './wired';
+import {isConditionalWired, Stack, Wired} from '.';
 
 describe('stack', () => {
   let stack: Stack;
@@ -49,7 +48,7 @@ describe('stack', () => {
       execute: () => Promise.resolve(true),
     } as Wired;
     stack.push(wired);
-    expect(stack.isConditionalWired(wired)).toBeTruthy();
+    expect(isConditionalWired(wired)).toBeTruthy();
   });
 
   it('should not execute wireds when conditional wireds falsy', () => {
