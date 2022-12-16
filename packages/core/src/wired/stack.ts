@@ -1,4 +1,4 @@
-import {Wired} from './wired';
+import {Wired, WIRED_COOLDOWN} from './wired';
 
 export class Stack {
   constructor(private wireds: Wired[] = []) {}
@@ -17,11 +17,17 @@ export class Stack {
   execute() {
     if (this.hasConditionalWireds() && this.executeConditionalWireds()) {
       this.wireds.forEach(async wired => {
-        if (!this.isConditionalWired(wired)) {
+        if (!this.isConditionalWired(wired) && !this.hasCooldown(wired)) {
           await wired.execute();
         }
       });
     }
+  }
+
+  hasCooldown(wired: Wired): boolean {
+    return (
+      wired.lastExecution.getTime() + WIRED_COOLDOWN > new Date().getTime()
+    );
   }
 
   hasConditionalWireds() {

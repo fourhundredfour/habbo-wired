@@ -8,7 +8,11 @@ describe('stack', () => {
   });
 
   it('should add a wired to stack', () => {
-    stack.push({type: 'condition', execute: () => Promise.resolve(true)});
+    stack.push({
+      type: 'condition',
+      execute: () => Promise.resolve(true),
+      lastExecution: new Date(),
+    } as Wired);
     expect(stack.hasConditionalWireds()).toBeTruthy();
   });
 
@@ -27,10 +31,12 @@ describe('stack', () => {
     const firstWired = {
       type: 'unknown',
       execute: jest.fn().mockRejectedValueOnce(Promise.resolve(true)),
+      lastExecution: new Date(),
     } as Wired;
     const secondWired = {
       type: 'unknown',
       execute: jest.fn().mockRejectedValueOnce(Promise.resolve(true)),
+      lastExecution: new Date(),
     } as Wired;
     stack.push(firstWired);
     stack.push(secondWired);
@@ -52,6 +58,7 @@ describe('stack', () => {
     const wired = {
       type: 'condition',
       execute: conditionalFn,
+      lastExecution: new Date(),
     } as Wired;
     const randomWired = {
       type: 'unknown',
