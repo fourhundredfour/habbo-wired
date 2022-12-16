@@ -1,0 +1,24 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "core library for habbo wired",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
+  },
+  "author": "Daniel Schischkin <daniel@schischkin.info>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^14.11.2",
+    "eslint": "^8.29.0",
+    "gts": "^3.1.1",
+    "typescript": "~4.7.0"
+  }
+}
