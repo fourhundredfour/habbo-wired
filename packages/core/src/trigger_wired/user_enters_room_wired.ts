@@ -1,19 +1,25 @@
 import {TriggerEvent, TriggerWired} from '.';
 import {Stack, WiredType} from '../wired';
 
-export type UserEntersRoomEvent = TriggerEvent;
+export class UserEntersRoomEvent implements TriggerEvent {
+  constructor(public readonly sender: number) {}
+}
 
 export class UserEntersRoomWired implements TriggerWired {
   type: WiredType = 'trigger';
-  lastExecutionDate: Date = new Date();
+  lastExecutionDate?: Date = undefined;
 
   constructor(private stack: Stack) {}
 
-  trigger(): void {
-    this.stack.execute();
+  async trigger(event: Event): Promise<void> {
+    if (!(event instanceof UserEntersRoomEvent)) {
+      return;
+    }
+    this.lastExecutionDate = new Date();
+    await this.stack.execute();
   }
 
-  get lastExecution(): Date {
+  get lastExecution(): Date | undefined {
     return this.lastExecutionDate;
   }
 

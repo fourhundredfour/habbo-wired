@@ -25,6 +25,9 @@ export class Stack {
   }
 
   hasCooldown(wired: Wired): boolean {
+    if (!wired.lastExecution) {
+      return false;
+    }
     return (
       wired.lastExecution.getTime() + WIRED_COOLDOWN > new Date().getTime()
     );
@@ -35,11 +38,14 @@ export class Stack {
   }
 
   async executeConditionalWireds(): Promise<boolean> {
-    return this.wireds.every(async wired => {
-      if (isConditionalWired(wired)) {
-        return await wired.execute();
-      }
-      return true;
-    });
+    const results = await Promise.all(
+      this.wireds.map(async wired => {
+        if (isConditionalWired(wired)) {
+          return await wired.execute();
+        }
+        return true;
+      })
+    );
+    return results.every(result => result === true);
   }
 }

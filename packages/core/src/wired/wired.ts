@@ -7,5 +7,5 @@ export interface Wired {
   type: WiredType;
   execute(): Promise<boolean>;
 
-  get lastExecution(): Date;
+  get lastExecution(): Date | undefined;
 }

@@ -1,4 +1,4 @@
-import {isConditionalWired, Stack, Wired} from '.';
+import {Stack, Wired} from '.';
 
 describe('stack', () => {
   let stack: Stack;
@@ -10,7 +10,7 @@ describe('stack', () => {
     stack.push({
       type: 'condition',
       execute: () => Promise.resolve(true),
-      lastExecution: new Date(),
+      lastExecution: undefined,
     } as Wired);
     expect(stack.hasConditionalWireds()).toBeTruthy();
   });
@@ -19,6 +19,7 @@ describe('stack', () => {
     const wired = {
       type: 'condition',
       execute: () => Promise.resolve(true),
+      lastExecution: undefined,
     } as Wired;
     stack.push(wired);
     expect(stack.hasConditionalWireds()).toBeTruthy();
@@ -26,45 +27,40 @@ describe('stack', () => {
     expect(stack.hasConditionalWireds()).toBeFalsy();
   });
 
-  it('should execute wireds', () => {
+  it('should execute wireds', async () => {
+    const wiredFn = jest.fn().mockReturnValue(Promise.resolve(true));
     const firstWired = {
       type: 'unknown',
-      execute: jest.fn().mockRejectedValueOnce(Promise.resolve(true)),
-      lastExecution: new Date(),
+      execute: wiredFn,
+      lastExecution: undefined,
     } as Wired;
     const secondWired = {
       type: 'unknown',
-      execute: jest.fn().mockRejectedValueOnce(Promise.resolve(true)),
-      lastExecution: new Date(),
+      execute: wiredFn,
+      lastExecution: undefined,
     } as Wired;
     stack.push(firstWired);
     stack.push(secondWired);
-    stack.execute();
+    await stack.execute();
+    expect(wiredFn).toHaveBeenCalledTimes(2);
   });
 
-  it('shoudld detect conditional wireds', () => {
+  it('should not execute wireds when conditional wireds falsy', async () => {
+    const randomWiredFn = jest.fn();
+    randomWiredFn.mockReturnValueOnce(Promise.resolve(true));
     const wired = {
       type: 'condition',
-      execute: () => Promise.resolve(true),
-    } as Wired;
-    stack.push(wired);
-    expect(isConditionalWired(wired)).toBeTruthy();
-  });
-
-  it('should not execute wireds when conditional wireds falsy', () => {
-    const conditionalFn = jest.fn();
-    conditionalFn.mockReturnValueOnce(Promise.resolve(false));
-    const wired = {
-      type: 'condition',
-      execute: conditionalFn,
-      lastExecution: new Date(),
+      execute: () => Promise.resolve(false),
+      lastExecution: undefined,
     } as Wired;
     const randomWired = {
       type: 'unknown',
-      execute: () => Promise.resolve(true),
+      execute: randomWiredFn,
+      lastExecution: undefined,
     } as Wired;
     stack.push(wired);
     stack.push(randomWired);
-    stack.execute();
+    await stack.execute();
+    expect(randomWiredFn).not.toHaveBeenCalled();
   });
 });
